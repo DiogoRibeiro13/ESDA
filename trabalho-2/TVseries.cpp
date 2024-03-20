@@ -354,12 +354,23 @@ void UserManagementList::addUser(User* newUser)
 /*     A implementar      */
 /**************************/
 
+
+
 list<TVSeries*> TVSeriesManagementList::seriesByCategory(string cat) const
 {
     //question 1
     list<TVSeries*> l;
     return l;
 }
+
+
+
+
+
+
+
+
+
 
 list<User*> UserManagementList::seeAll(TVSeries* series)
 {
@@ -368,17 +379,44 @@ list<User*> UserManagementList::seeAll(TVSeries* series)
     return l;
 }
 
+
+
+
+
+
+
+
+
+
 int User::numberOfEpisodesToSee(string title, list<TVSeries*> listTVSeries )
 {
     //question 3
     return -2;
 }
 
+
+
+
+
+
+
+
+
+
 int TVSeriesManagementList::TVSeriesDelete(string title, UserManagementList& userManagementlist)
 {
     //question 4
     return -2;
 }
+
+
+
+
+
+
+
+
+
 
 list<TVSeries*> TVSeriesManagementList::suggestsSeries(string username,string userWhoSuggests, list<User*> userlist ) const
 {
