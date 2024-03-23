@@ -358,9 +358,44 @@ void UserManagementList::addUser(User* newUser)
 
 list<TVSeries*> TVSeriesManagementList::seriesByCategory(string cat) const
 {
-    //question 1
-    list<TVSeries*> l;
-    return l;
+    //Cria uma lista vazia "CatList" à qual serão adicionadas as séries da categoria "cat"
+    list<TVSeries*> CatList;
+
+    int i; //Variável para iteração no ciclo "for"
+    bool ValidCat = false; //Variável que tem valor "false" caso "cat" não seja uma categoria valida, e "true" caso seja valida
+
+
+    //Ciclo "for" que precorre todos os géneros disponíveis na plataforma
+    for(i=0; i < (N_GENRES-1); i++)
+    {
+        //Verifica se o género "cat" corresponde a algum dos géneros existentes
+        if(cat == vGenres[i])
+        {
+            //Caso corresponda então é um género válido e "ValidCat" passa a ter valor "true"
+            ValidCat = true;
+        }
+    }
+
+    //Caso "ValidCat" mantenha o valor "false", então a série é inválida e é retornada uma lista vazia
+    if(ValidCat == false)
+    {
+        return CatList; //Notar que ainda não foi adicionado qualquer elemento à lista 
+    }
+
+
+    //Ciclo "for" que precorre a lista com todas as séries disponíveis na plataforma
+    for(auto j = listTVSeries.begin(); j != listTVSeries.end(); j++)
+    {
+        //Verifica se a categoria da série na posição atual é igual a "cat"
+        if((*j)->getGenre() == cat)
+        {
+            //Caso seja, adiciona a série à lista "CatList"
+            CatList.push_back(*j);
+        }
+    }
+
+    //Retorna a lista "CatList" que contém todas as séries da categoria "cat"
+    return CatList;
 }
 
 
