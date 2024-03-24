@@ -409,9 +409,52 @@ list<TVSeries*> TVSeriesManagementList::seriesByCategory(string cat) const
 
 list<User*> UserManagementList::seeAll(TVSeries* series)
 {
-    //question 2
-    list<User*> l;
-    return l;
+    //Cria um vetor "SeenAll" inicialmente vazio que vai conter os Users que viram todos os episódios de uma determinada série
+    list<User*> SeenAll;
+
+    //Verifica se o apontador para a série em questão não é um nullptr
+    if(series == nullptr)
+    {
+        //Caso seja, retorna o vetor "SeenAll" ainda vazio
+        return SeenAll;
+    }
+
+
+    size_t Season; //Variável utilizada no ciclo "for" para representar a posição da temporada na iteração atual
+    int TotalEps = 0; //Variável que representa o número total de episódios da série
+
+    //Ciclo "for" que percorre o vetor de Episódios por Temporada
+    for(Season = 0; Season < series->getEpisodesPerSeason().size(); Season++)
+    {
+        //A cada iteração soma o número de episódios da temporada na posição atual
+        //No final do ciclo "for", "TotalEps" representará o número total de episódios da série
+        TotalEps += series->getEpisodesPerSeason()[Season];
+    }
+
+
+    size_t SerPos; //Variável utilizada no ciclo "for" para representar a posição da série na iteração atual
+
+    //Ciclo "for" que percorre a lista com todos os users
+    //A variável "UserPtr" aponta para outro apontador, que aponta para o User na primeira posição 
+    for(auto UserPtr = listUsers.begin(); UserPtr != listUsers.end(); UserPtr++)
+    {
+        //Cria um vetor do tipo "TVSeries*", "CopyWatSer", que é uma cópia do vetor de séries vistas pelo user na posição atual da lista de Users, "listUsers"
+        vector<TVSeries*> CopyWatSer = (*UserPtr)->getWatchedSeries();
+        
+        //Ciclo "for" que percorre o vetor "CopyWatSer"
+        for(SerPos=0; SerPos < CopyWatSer.size(); SerPos++)
+        {
+            //Verifica que o User viu a série apontada por "series" e de que viu os episódios todos
+            if((CopyWatSer[SerPos] == series) && ((*UserPtr)->getEpisodesWatched()[SerPos] == TotalEps))
+            {
+                //Se isso for verdade, então o User à lista de Users que viram todos os episódios da série apontada por "series", "SeenAll"
+                SeenAll.push_back(*UserPtr);
+            }
+        }
+    }
+
+    //Retorna a lista "SeenAll", agora preenchida no caso de existirem users que cumpram todas as condições
+    return SeenAll;
 }
 
 
