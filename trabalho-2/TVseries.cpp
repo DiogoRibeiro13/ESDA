@@ -361,9 +361,11 @@ list<TVSeries*> TVSeriesManagementList::seriesByCategory(string cat) const
     //Cria uma lista vazia "CatList" à qual serão adicionadas as séries da categoria "cat"
     list<TVSeries*> CatList;
 
+
+    /* VERIFICAÇÃO DE SE "cat" É VALIDO */
+
     int i; //Variável para iteração no ciclo "for"
     bool ValidCat = false; //Variável que tem valor "false" caso "cat" não seja uma categoria valida, e "true" caso seja valida
-
 
     //Ciclo "for" que precorre todos os géneros disponíveis na plataforma
     for(i=0; i < (N_GENRES-1); i++)
@@ -372,7 +374,9 @@ list<TVSeries*> TVSeriesManagementList::seriesByCategory(string cat) const
         if(cat == vGenres[i])
         {
             //Caso corresponda então é um género válido e "ValidCat" passa a ter valor "true"
+            //Como não precisamos procurar mais e por isso fazemos break
             ValidCat = true;
+            break;
         }
     }
 
@@ -382,6 +386,8 @@ list<TVSeries*> TVSeriesManagementList::seriesByCategory(string cat) const
         return CatList; //Notar que ainda não foi adicionado qualquer elemento à lista 
     }
 
+
+    /* ADIÇÃO DE SÉRIES DA CATEGORIA "cat" À LISTA */
 
     //Ciclo "for" que precorre a lista com todas as séries disponíveis na plataforma
     for(auto j = listTVSeries.begin(); j != listTVSeries.end(); j++)
@@ -412,6 +418,9 @@ list<User*> UserManagementList::seeAll(TVSeries* series)
     //Cria um vetor "SeenAll" inicialmente vazio que vai conter os Users que viram todos os episódios de uma determinada série
     list<User*> SeenAll;
 
+
+    /* VERIFICAÇÃO DE SE "series" É VALIDO */
+
     //Verifica se o apontador para a série em questão não é um nullptr
     if(series == nullptr)
     {
@@ -419,6 +428,8 @@ list<User*> UserManagementList::seeAll(TVSeries* series)
         return SeenAll;
     }
 
+
+    /* cÁLCULO DO NÚMERO TOTAL DE EPISÓDIOS DA SÉRIE */
 
     size_t Season; //Variável utilizada no ciclo "for" para representar a posição da temporada na iteração atual
     int TotalEps = 0; //Variável que representa o número total de episódios da série
@@ -432,10 +443,12 @@ list<User*> UserManagementList::seeAll(TVSeries* series)
     }
 
 
+    /* VERIFICAÇÃO DOS USERS QUE VIRAM TODOS OS EPISÓDIOS DA SÉRIE */
+
     size_t SerPos; //Variável utilizada no ciclo "for" para representar a posição da série na iteração atual
 
     //Ciclo "for" que percorre a lista com todos os users
-    //A variável "UserPtr" aponta para outro apontador, que aponta para o User na primeira posição 
+    //A variável "UserPtr" aponta para outro apontador, que por sua vez aponta para o User na posição atual
     for(auto UserPtr = listUsers.begin(); UserPtr != listUsers.end(); UserPtr++)
     {
         //Cria um vetor do tipo "TVSeries*", "CopyWatSer", que é uma cópia do vetor de séries vistas pelo user na posição atual da lista de Users, "listUsers"
@@ -468,8 +481,99 @@ list<User*> UserManagementList::seeAll(TVSeries* series)
 
 int User::numberOfEpisodesToSee(string title, list<TVSeries*> listTVSeries )
 {
-    //question 3
-    return -2;
+    /* VERIFICAÇÃO DE SE "title" É VÁLIDO */
+    
+    //Verifica se o título, "title", não é uma string vazia
+    if(title == "")
+    {
+        //Caso seja retorna -1
+        return -1;
+    }
+
+
+    /* VERIFICAÇÃO DE SE A SÉRIE EXISTE NA PLATAFORMA */
+
+    bool ValidSer = false; //Variável que tem valor "true" ou "false" dependo se a série indicada por "title" existe ou não na plataforma, respetivamente 
+
+    //Ciclo "for" que precorre a lista "listTVSeries" com todas as séries da plataforma
+    //A variável "SerPtr" aponta para outro apontador, que por sua vez aponta para a série na posição atual
+    for(auto SerPtr = listTVSeries.begin(); SerPtr != listTVSeries.end(); SerPtr++)
+    {
+        //Verifica se a série na posição atual é igual á que procuramos, "title"
+        if((*SerPtr)->getTitle() == title)
+        {
+            //Se for igual, "ValidSer" passa a ter valor "true"
+            //Como a série já foi encontrada não precisamos procurar mais e por isso usamos break para sair do ciclo "for"
+            ValidSer = true;
+            break;
+        }
+    }
+
+    //Se "ValidSer" se mantiver com valor "false" retorna -1
+    if(ValidSer == false)
+    {
+        return -1;
+    }
+
+
+    /* VERIFICAÇÃO DE SE A SÉRIE EXISTE NA FILA "wishSeries" DO USER */
+
+    queue<TVSeries*> CopyWish; //Cria uma fila, "CopyWish", que será um cópia da fila "wishSeries"
+    CopyWish = getWishSeries(); //Desta forma "wishSeries" nunca é alterada
+    bool ValidWish = false; //Variável que tem valor "true" ou "false" dependo se a série indicada por "title" existe ou não na fila de Wished Series do User, respetivamente
+
+    //Ciclo "while" que se repete até que a fila "CopyWish" estar vazia
+    while(!CopyWish.empty())
+    {
+        //Verifica se o próximo série na fila é igual à que procuramos, "title"
+        if(CopyWish.front()->getTitle() == title)
+        {
+            //Se for igual, "ValidWish" passa a ter valor "true"
+            //Como a série já foi encontrada não precisamos procurar mais e por isso usamos break para sair do ciclo "while"
+            ValidWish = true;
+            break;
+        }
+
+        CopyWish.pop(); //A cada iteração remove o elemento à frente na lista
+    }
+
+    //Se "ValidWish" se mantiver com valor "false" retorna -1
+    if(ValidWish == false)
+    {
+        return -1;
+    }
+
+    
+    /* CÁLCULO DOS EPISÓDIOS QUE FALTAM ATÉ A SÉRIE "title" */
+
+    CopyWish = getWishSeries(); //Dá reset às mudanças feitas a "CopyWish"
+    int i; //Variável para iteração do loop "for"
+    int TotalEps = 0; //Váriavel que representa o número total de episódios a assitir até à série "title"
+
+    //Ciclo "while" que se repete até que a fila "CopyWish" estar vazia
+    while(!CopyWish.empty())
+    {
+        //Verifica se a próxima série na fila é a que procuramos, "title"
+        if(CopyWish.front()->getTitle() == title)
+        {
+            break; //Caso seja não precisamos procurar mais e por isso usamos break para sair do ciclo "while"
+        }
+
+        else
+        {
+            //Ciclo "for" que se repete para cada temporada da série atual
+            for(i=0; i < CopyWish.front()->getNumberOfSeasons(); i++)
+            {
+                //A cada iteração adiciona o número de episódios da temporada ao número de episódios que faltam ver
+                TotalEps += CopyWish.front()->getEpisodesPerSeason()[i];
+            }
+
+            CopyWish.pop(); //A cada iteração remove o elemento à frente na lista
+        }
+    }
+
+    //Retorna o número de episódios que faltam ver até chegar à série "title"
+    return TotalEps;
 }
 
 
