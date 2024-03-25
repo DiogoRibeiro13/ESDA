@@ -657,9 +657,26 @@ int TVSeriesManagementList::TVSeriesDelete(string title, UserManagementList& use
 
 list<TVSeries*> TVSeriesManagementList::suggestsSeries(string username,string userWhoSuggests, list<User*> userlist ) const
 {
-    list<TVSeries*> SuggestedSeries; 
-    
-    if(username == "")
+    list<TVSeries*> SuggestedSeries;
+
+    bool UserExist = false;
+    auto UserPos = userlist.begin();
+
+    for(UserPos = userlist.begin(); UserPos != userlist.end(); UserPos++)
+    {
+        if(userWhoSuggests == "" && UserPos == userlist.begin())
+        {
+            break;
+        }
+
+        if((*UserPos)->getName() == username)
+        {
+            UserExist = true;
+            break;
+        }
+    }
+
+    if(UserExist == false)
     {
         return SuggestedSeries;
     }
@@ -678,17 +695,6 @@ list<TVSeries*> TVSeriesManagementList::suggestsSeries(string username,string us
         if((*UserSugPos)->getName() == userWhoSuggests)
         {
             UserSugExist = true;
-            break;
-        }
-    } 
-
-
-    auto UserPos = userlist.begin();
-
-    for(UserPos = userlist.begin(); UserPos != userlist.end(); UserPos++)
-    {
-        if((*UserPos)->getName() == username)
-        {
             break;
         }
     } 
