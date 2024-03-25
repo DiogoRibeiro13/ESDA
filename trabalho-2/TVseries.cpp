@@ -587,8 +587,63 @@ int User::numberOfEpisodesToSee(string title, list<TVSeries*> listTVSeries )
 
 int TVSeriesManagementList::TVSeriesDelete(string title, UserManagementList& userManagementlist)
 {
-    //question 4
-    return -2;
+    bool SerFound = false;
+    
+    for(auto SerPos = listTVSeries.begin(); SerPos != listTVSeries.end(); SerPos++)
+    {
+        if((*SerPos)->getTitle() == title)
+        {
+            SerFound = true;
+
+            listTVSeries.erase(SerPos);
+            break;
+        }
+        
+    }
+    
+    if(SerFound == false)
+    {
+        return -1;
+    }
+    
+
+    list<User*> CopyUserList = userManagementlist.getListUsers();
+    queue<TVSeries*> AuxWish;
+
+    for(auto UserPos = CopyUserList.begin(); UserPos != CopyUserList.end(); UserPos++)
+    {
+        for(auto WatSerPos = (*UserPos)->getWatchedSeries().begin(); WatSerPos != (*UserPos)->getWatchedSeries().end(); WatSerPos++)
+        {
+            if((*WatSerPos)->getTitle() == title)
+            {
+                (*UserPos)->getWatchedSeries().erase(WatSerPos);
+                
+
+                auto RatingPos = (*UserPos)->getRatings().begin() + (WatSerPos - (*UserPos)->getWatchedSeries().begin());
+                (*UserPos)->getRatings().erase(RatingPos);
+                
+
+                auto EpWatPos = (*UserPos)->getEpisodesWatched().begin() + (WatSerPos - (*UserPos)->getWatchedSeries().begin());
+                (*UserPos)->getEpisodesWatched().erase(EpWatPos);
+                
+
+                (*UserPos)->getWishSeries().pop();
+
+                break;
+            }
+
+            else
+            {
+                AuxWish.push((*UserPos)->getWishSeries().front());
+
+                (*UserPos)->getWishSeries().pop();
+            }
+
+            (*UserPos)->getWishSeries() = AuxWish;
+        }
+    }
+    
+    return 0;
 }
 
 
@@ -602,7 +657,112 @@ int TVSeriesManagementList::TVSeriesDelete(string title, UserManagementList& use
 
 list<TVSeries*> TVSeriesManagementList::suggestsSeries(string username,string userWhoSuggests, list<User*> userlist ) const
 {
-    //question 5
-    list<TVSeries*> l;
-    return l;
+    list<TVSeries*> SuggestedSeries; 
+    
+    if(username == "")
+    {
+        return SuggestedSeries;
+    }
+
+
+    bool UserSugExist = false;
+    auto UserSugPos = userlist.begin();
+
+    for(UserSugPos = userlist.begin(); UserSugPos != userlist.end(); UserSugPos++)
+    {
+        if(userWhoSuggests == "" && UserSugPos == userlist.begin())
+        {
+            break;
+        }
+        
+        if((*UserSugPos)->getName() == userWhoSuggests)
+        {
+            UserSugExist = true;
+            break;
+        }
+    } 
+
+
+    auto UserPos = userlist.begin();
+
+    for(UserPos = userlist.begin(); UserPos != userlist.end(); UserPos++)
+    {
+        if((*UserPos)->getName() == username)
+        {
+            break;
+        }
+    } 
+
+
+    size_t i;
+    bool ValidGenre = false;
+    bool NotWatched = true;
+
+    if(UserSugExist == true)
+    {
+        for(auto SerSugPos = (*UserSugPos)->getWatchedSeries().begin(); SerSugPos != (*UserSugPos)->getWatchedSeries().end(); SerSugPos++)
+        {
+            for(i = 0; i < (*UserPos)->getFavoriteGenres().size(); i++)
+            {
+                if((*SerSugPos)->getGenre() == (*UserPos)->getFavoriteGenres()[i])
+                {
+                    ValidGenre = true;
+                    break;
+                }
+            }
+
+            if(ValidGenre == true)
+            {
+                for(auto SerPos = (*UserPos)->getWatchedSeries().begin(); SerPos != (*UserPos)->getWatchedSeries().end(); SerPos++)
+                {
+                    if((*SerSugPos)->getTitle() == (*SerPos)->getTitle())
+                    {
+                        NotWatched = false;
+                        break;
+                    }
+                }
+            }
+
+            if(ValidGenre == true && NotWatched == true)
+            {
+                SuggestedSeries.push_back(*SerSugPos);
+            }
+        }
+    }
+
+
+    else
+    {
+        for(auto SerListPos = getListTVSeries().begin(); SerListPos != getListTVSeries().end(); SerListPos++)
+        {
+            for(i = 0; i < (*UserPos)->getFavoriteGenres().size(); i++)
+            {
+                if((*SerListPos)->getGenre() == (*UserPos)->getFavoriteGenres()[i])
+                {
+                    ValidGenre = true;
+                    break;
+                }
+            }
+
+            if(ValidGenre == true)
+            {
+                for(auto SerPos = (*UserPos)->getWatchedSeries().begin(); SerPos != (*UserPos)->getWatchedSeries().end(); SerPos++)
+                {
+                    if((*SerListPos)->getTitle() == (*SerPos)->getTitle())
+                    {
+                        NotWatched = false;
+                        break;
+                    }
+                }
+            }
+
+            if(ValidGenre == true && NotWatched == true)
+            {
+                SuggestedSeries.push_back(*SerListPos);
+            }
+        }
+    }
+
+
+    return SuggestedSeries;
 }
