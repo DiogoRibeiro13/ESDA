@@ -664,7 +664,7 @@ list<TVSeries*> TVSeriesManagementList::suggestsSeries(string username,string us
 
     for(UserPos = userlist.begin(); UserPos != userlist.end(); UserPos++)
     {
-        if(userWhoSuggests == "" && UserPos == userlist.begin())
+        if(username == "" && UserPos == userlist.begin())
         {
             break;
         }
