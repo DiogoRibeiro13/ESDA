@@ -700,11 +700,11 @@ list<TVSeries*> TVSeriesManagementList::suggestsSeries(string username,string us
 
     if(UserSugExist == true)
     {
-        for(auto SerSugPos = (*UserSugPos)->getWatchedSeries().begin(); SerSugPos != (*UserSugPos)->getWatchedSeries().end(); SerSugPos++)
+        for(auto SugSerPos = (*UserSugPos)->getWatchedSeries().begin(); SugSerPos != (*UserSugPos)->getWatchedSeries().end(); SugSerPos++)
         {
             for(i = 0; i < (*UserPos)->getFavoriteGenres().size(); i++)
             {
-                if((*SerSugPos)->getGenre() == (*UserPos)->getFavoriteGenres()[i])
+                if((*UserPos)->getFavoriteGenres()[i] == (*SugSerPos)->getGenre())
                 {
                     ValidGenre = true;
                     break;
@@ -715,7 +715,7 @@ list<TVSeries*> TVSeriesManagementList::suggestsSeries(string username,string us
             {
                 for(auto SerPos = (*UserPos)->getWatchedSeries().begin(); SerPos != (*UserPos)->getWatchedSeries().end(); SerPos++)
                 {
-                    if((*SerSugPos)->getTitle() == (*SerPos)->getTitle())
+                    if((*SerPos)->getTitle() == (*SugSerPos)->getTitle())
                     {
                         NotWatched = false;
                         break;
@@ -725,7 +725,7 @@ list<TVSeries*> TVSeriesManagementList::suggestsSeries(string username,string us
 
             if(ValidGenre == true && NotWatched == true)
             {
-                SuggestedSeries.push_back(*SerSugPos);
+                SuggestedSeries.push_back(*SugSerPos);
             }
         }
     }
@@ -737,7 +737,7 @@ list<TVSeries*> TVSeriesManagementList::suggestsSeries(string username,string us
         {
             for(i = 0; i < (*UserPos)->getFavoriteGenres().size(); i++)
             {
-                if((*SerListPos)->getGenre() == (*UserPos)->getFavoriteGenres()[i])
+                if((*UserPos)->getFavoriteGenres()[i] == (*SerListPos)->getGenre())
                 {
                     ValidGenre = true;
                     break;
