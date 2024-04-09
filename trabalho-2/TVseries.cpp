@@ -731,7 +731,7 @@ list<TVSeries*> TVSeriesManagementList::suggestsSeries(string username,string us
 
             if(ValidGenre == true && NotWatched == true)
             {
-                SuggestedSeries.push_back(*SugSerPos);
+                SuggestedSeries.push_front(*SugSerPos);
             }
         }
     }
