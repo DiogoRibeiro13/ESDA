@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <cctype>
 #include "TVseries.hpp"
+#include <iostream>
 
 using namespace std;
 
@@ -712,8 +713,43 @@ void UserManagementTree::inorder() {
 
 priority_queue<TVSeries> UserManagement::queueTVSeriesCategory(priority_queue<TVSeries>& pq, string cat)
 {
-    priority_queue<TVSeries> pqnew;
-    return pqnew;
+    priority_queue <TVSeries> pqcopy = pq; //Cria uma cópia de "pq"
+    priority_queue <TVSeries> pqnew; //Cria uma nova fila de prioridade vazia "pqnew"
+
+
+    bool ValidCat = false; //Verifica se "cat" é um género válido (Inicialmente tem valor "false")
+
+    //Ciclo "for" que precorre o vetor como todos os géneros
+    for(int i=1; i < N_GENRES; i++)
+    {
+        //Verifica se o género "cat" corresponde a algum dos géneros existentes
+        if(cat == vGenres[i])
+        {
+            ValidCat = true; //Caso corresponda então é um género válido e "ValidCat" passa a ter valor "true"
+        }
+    }
+
+    //Verifica se "ValidCat" continua a "false", ou seja não é válida
+    if(ValidCat == false)
+    {
+        return pqnew; //Notar que ainda não foi adicionado qualquer elemento à lista
+    }
+    
+
+    //Ciclo "for" que acontece enquanto "pqcopy" não está vazio
+    while(!pqcopy.empty())
+    {
+        //Verifica se o género da série com maior prioridade de "pqcopy" é igual ao que procuramos
+        if(pqcopy.top().getGenre() == cat)
+        {
+            pqnew.push(pqcopy.top()); //Se for adiciona a série a "newpq"
+        }
+
+        pqcopy.pop(); //Remove o elemento com maior prioridade de "pqcopy"
+    }
+
+
+    return pqnew; //Retorna a "pqnew" com as séries do género desejado
 }
 
 
