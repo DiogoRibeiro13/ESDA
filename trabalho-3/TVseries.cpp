@@ -813,8 +813,27 @@ priority_queue<TVSeries> UserManagement::queueTVSeries(list<TVSeries*> listTV,in
 
 vector<User*> UserManagementTree::usersInitialLetter(NodeUser* root,char ch)
 {
-    vector<User*> v;
-    return v;
+    vector<User*> UserLet;
+    
+    if(root == nullptr)
+    {
+        return UserLet;
+    }
+    
+    if(ch < 65 || ch > 90 || ch < 97 || ch > 122)
+    {
+        return UserLet;
+    }
+
+    if(root->user->getUsername()[0] == ch || root->user->getUsername()[0] == (ch + 32) || root->user->getUsername()[0] == (ch - 32))
+    {
+        UserLet.push_back(root->user);
+    }
+
+    usersInitialLetter(root->left, ch);
+    usersInitialLetter(root->right, ch);
+
+    return UserLet;
 }
 
 
