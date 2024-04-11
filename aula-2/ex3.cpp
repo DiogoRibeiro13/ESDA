@@ -49,7 +49,7 @@ void print( int (&matrix)[3][3], int lines, int col)
             cout << matrix[i][j] << " ";
         }
         
-        cout << "]" << endl;
+        cout << " ]" << endl;
     }
 }
 

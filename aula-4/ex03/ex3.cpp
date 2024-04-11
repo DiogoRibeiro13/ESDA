@@ -36,7 +36,7 @@ vector<int> encontrapadrao(vector<int> v, vector<int> vp)
     if(n == (int)vp.size()) vr.push_back(i);
   }
 
-  return vr; 
+  return vr;  
 }
 
 

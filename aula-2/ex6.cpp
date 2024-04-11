@@ -31,14 +31,13 @@ int import(const string name_file, Person (&v)[10])
         return -1;
     }
 
-    stringstream ss;
     string save;
     int pos = 0;
 
     while (getline(file, save) && pos < 10)
     {
-        ss.clear;
-        ss << save;
+        istringstream ss(save);
+
         getline(ss, v[pos].name, ',');
         ss >> v[pos].age;
         ss.ignore();

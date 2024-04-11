@@ -14,7 +14,7 @@ struct Person
 
 int modifyByPointer(Person* person,string name, int age)
 {    
-    if(age < 0 || name.length() <= 0)
+    if(age < 0 || name.length() == 0)
     {
         return -1;
     }
@@ -36,7 +36,7 @@ int modifyByPointer(Person* person,string name, int age)
 
 int modifyByReference(Person& person,string name, int age)
 {
-    if(age < 0 || name.length() <= 0)
+    if(age < 0 || name.length() == 0)
     {
         return -1;
     }
