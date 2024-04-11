@@ -760,8 +760,49 @@ priority_queue<TVSeries> UserManagement::queueTVSeriesCategory(priority_queue<TV
 
 priority_queue<TVSeries> UserManagement::queueTVSeries(list<TVSeries*> listTV,int min)
 {
-    priority_queue<TVSeries> q;
-    return q;
+    list<TVSeries*> listCopy = listTV;
+    priority_queue <TVSeries> pqRat;
+
+    if(min <= 0)
+    {
+        return pqRat;
+    }
+    
+    for(auto SerPos = listCopy.begin(); SerPos != listCopy.end(); SerPos++)
+    {
+        if(SerPos == nullptr)
+        {
+            return pqRat;
+        }
+    }
+
+    while(!listCopy.empty())
+    {
+        int cnt = 0;
+        
+        for(auto UserPos = vectorUsers.begin(); UserPos != vectorUsers.end(); UserPos++)
+        {
+            for(size_t i = 0; i < (*UserPos)->getWatchedSeries().size(); i++)
+            {
+                if((*UserPos)->getWatchedSeries()[i]->getTitle() == listCopy.front()->getTitle())
+                {
+                    if((*UserPos)->getEpisodesWatched()[i] >= 2)
+                    {
+                        cnt++;
+                    }
+                }
+            }
+        }
+
+        if(cnt >= min)
+        {
+            pqRat.push(*listCopy.front());
+        }
+        
+        listCopy.pop_front();
+    }
+    
+    return pqRat;
 }
 
 
