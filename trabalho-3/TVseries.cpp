@@ -750,6 +750,9 @@ priority_queue<TVSeries> UserManagement::queueTVSeriesCategory(priority_queue<TV
 
 
     return pqnew; //Retorna a "pqnew" com as séries do género desejado
+
+    //Because we are suposed to answer here
+    //answer here
 }
 
 
@@ -766,14 +769,6 @@ priority_queue<TVSeries> UserManagement::queueTVSeries(list<TVSeries*> listTV,in
     if(min <= 0)
     {
         return pqRat;
-    }
-    
-    for(auto SerPos = listCopy.begin(); SerPos != listCopy.end(); SerPos++)
-    {
-        if(SerPos == nullptr)
-        {
-            return pqRat;
-        }
     }
 
     while(!listCopy.empty())
@@ -803,6 +798,9 @@ priority_queue<TVSeries> UserManagement::queueTVSeries(list<TVSeries*> listTV,in
     }
     
     return pqRat;
+
+    //Because we are suposed to answer here
+    //answer here
 }
 
 
@@ -813,27 +811,34 @@ priority_queue<TVSeries> UserManagement::queueTVSeries(list<TVSeries*> listTV,in
 
 vector<User*> UserManagementTree::usersInitialLetter(NodeUser* root,char ch)
 {
-    vector<User*> UserLet;
+    vector<User*> UserIni;
     
     if(root == nullptr)
     {
-        return UserLet;
+        return UserIni;
     }
     
-    if(ch < 65 || ch > 90 || ch < 97 || ch > 122)
+    if((ch < 65 || ch > 90) && (ch < 97 || ch > 122))
     {
-        return UserLet;
+        return UserIni;
     }
 
     if(root->user->getUsername()[0] == ch || root->user->getUsername()[0] == (ch + 32) || root->user->getUsername()[0] == (ch - 32))
     {
-        UserLet.push_back(root->user);
+        UserIni.push_back(root->user);
     }
 
-    usersInitialLetter(root->left, ch);
-    usersInitialLetter(root->right, ch);
+    vector<User*> VecLeft = usersInitialLetter(root->left, ch);
+    vector<User*> VecRight = usersInitialLetter(root->right, ch);
+    
+    UserIni.insert(UserIni.end(), VecLeft.begin(), VecLeft.end());
+    UserIni.insert(UserIni.end(), VecRight.begin(), VecRight.end());
 
-    return UserLet;
+
+    return UserIni;
+    
+    //Because we are suposed to answer here
+    //answer here 
 }
 
 
@@ -844,8 +849,51 @@ vector<User*> UserManagementTree::usersInitialLetter(NodeUser* root,char ch)
 
 list<User*> UserManagementTree::usersNotFan(NodeUser* root)
 {
-    list<User*> lt;
-    return lt;
+    list<User*> UserVec;
+    int NumEps = 0;
+    int SerCnt = 0;
+    
+
+    if(root == nullptr)
+    {
+        return UserVec;
+    }
+    
+
+    auto aux = root->user->getWatchedSeries();
+
+    for(size_t SerPos = 0; SerPos < aux.size(); SerPos++)
+    {
+        for(int i = 0; i < aux[SerPos]->getNumberOfSeasons(); i++)
+        {
+            NumEps += aux[SerPos]->getEpisodesPerSeason()[i];
+        }
+
+        if(root->user->getEpisodesWatched()[SerPos] < NumEps)
+        {
+            SerCnt++;
+        }
+
+        NumEps = 0;
+    }
+
+
+    if(SerCnt > 2)
+    {
+        UserVec.push_back(root->user);
+    }
+    
+
+    list<User*> VecLeft = usersNotFan(root->left);
+    list<User*> VecRight = usersNotFan(root->right);
+    
+    UserVec.insert(UserVec.end(), VecLeft.begin(), VecLeft.end());
+    UserVec.insert(UserVec.end(), VecRight.begin(), VecRight.end());
+    
+    return UserVec;
+    
+    //Because we are suposed to answer here
+    //answer here
 }
 
 
@@ -856,6 +904,107 @@ list<User*> UserManagementTree::usersNotFan(NodeUser* root)
 
 vector<int> UserManagementTree::usersCategoryStatistics(NodeUser* root,string cat,int perc)
 {
-   vector<int> v;
-   return v;
+    vector<int> ReturnVec{0,0,0};
+    vector<int> Res;
+    int WatSer = 0, MinEps = 0, WatSerFav = 0, PercEps = 0, NumEps = 0;
+    bool VerWatSer = false, VerMinEps = false, VerWatSerFav = false, ValidCat = false;
+    
+
+    if(root == nullptr || perc <= 0 || perc > 100)
+    {
+        return ReturnVec;
+    }
+
+
+    for(int i=0; i < (N_GENRES-1); i++)
+    {
+        //Verifica se o género "cat" corresponde a algum dos géneros existentes
+        if(cat == vGenres[i])
+        {
+            //Caso corresponda então é um género válido e "ValidCat" passa a ter valor "true"
+            ValidCat = true;
+        }
+    }
+    
+    if(ValidCat == false)
+    {
+        return ReturnVec;
+    }
+
+
+    auto AuxSer = root->user->getWatchedSeries();
+    auto AuxFav = root->user->getFavoriteGenres();
+    auto AuxEps = root->user->getEpisodesWatched();
+    
+    for(size_t SerPos = 0; SerPos < AuxSer.size(); SerPos++)
+    {
+        if(AuxSer[SerPos]->getGenre() == cat)
+        {
+            VerWatSerFav = true;
+            
+            for(int i = 0; i < AuxSer[SerPos]->getNumberOfSeasons(); i++)
+            {
+                NumEps += AuxSer[SerPos]->getEpisodesPerSeason()[i];
+            }
+            
+            PercEps = ((NumEps * perc)/100);
+            NumEps = 0;
+
+            if(AuxEps[SerPos] >= PercEps)
+            {
+                VerMinEps = true;
+
+                for(size_t j = 0; j < AuxFav.size(); j++)
+                {
+                    if(AuxFav[j] == cat)
+                    {
+                        VerWatSer = true;
+                    }
+                }
+            }
+        }
+    }
+    
+    if(VerWatSerFav == true)
+    {
+        WatSer++;
+    }    
+
+    if(VerMinEps == true)
+    {
+        MinEps++;
+    }
+
+    if(VerWatSer == true)
+    {
+        WatSerFav++;
+    }
+    
+    Res.push_back(WatSer);
+    Res.push_back(MinEps);
+    Res.push_back(WatSerFav);
+    
+
+    vector<int> VecLeft = usersCategoryStatistics(root->left, cat, perc); 
+    
+    if(VecLeft != ReturnVec)
+    {
+        Res[0] += VecLeft[0];                          
+        Res[1] += VecLeft[1];
+        Res[2] += VecLeft[2];
+    }
+    
+    vector<int> VecRight = usersCategoryStatistics(root->right, cat, perc);
+    
+    if(VecRight != ReturnVec)
+    {
+        Res[0] += VecRight[0];                          
+        Res[1] += VecRight[1];
+        Res[2] += VecRight[2];
+    }
+    
+    return Res;
+
+    //Because we are suposed to answer here
+    //answer here
 }
