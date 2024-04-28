@@ -1416,8 +1416,57 @@ int UserManagementGraph::shortestPaths(User* userSrc, User* userDst)
 
 int HashTable::insertCountryStats(CountryStats &countryS)
 {       
-    // question 4    
-    return -1;
+    //Inicialização do índice e key respetivamente
+    int i;
+    string key = countryS.country;
+    
+
+    //Verifica se a key não é uma string vazia
+    if(key.empty())
+    {
+        return -1;
+    }
+
+
+    //Calcula o índice do elemento usando a função "hashFunction"
+    i = hashFunction(key);
+
+
+    //Verifica se o elemento já existe, caso exista retorna -1
+    if(table[i] == &countryS)
+    {
+        return -1;
+    }
+
+
+    //Inicializada o Grau de Colisão a 0
+    int DegCol = 1;
+
+    //Verifica se já existe um elemento no índice onde este deveria estar este elemento, ou seja, se existe uma colisão
+    //A função "probingFunction" vai tentar resolver a colisão a cada iteração, aumentando também DegCol em 1
+    //Se o DegCol passar de 10, consideramos que a tabela de disperção não está otimizada e tentamos resolver a colisão colocando num espaço de um elemnto apagado
+    while(table[i] != nullptr && DegCol < 10)
+    {
+        i = probingFunction(key, DegCol++);
+    }
+
+
+    //Verifica se já existe um elemento no índice onde este deveria estar este elemento, ou seja, se existe uma colisão
+    //Em caso de colisão, tenta colocar o elemento no índice de um elemento que tenha sido previamente apagado
+    if(table[i] != nullptr)
+    {
+        i = hashFunction("apagado");
+    }
+
+
+    //Quando não existir colisão, adicionamos o elemento "&countryS" ao índice que lhe foi atribuido
+    table[i] = &countryS;
+    
+
+    //Atualizamos o número de elementosefetivos na tabela de dispersão
+    totalCountryStats++;
+    
+    return i;
 
     //answer here
     //Because there is no other option :)
