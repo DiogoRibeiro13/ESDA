@@ -1210,9 +1210,79 @@ vector<User*> UserManagementGraph::mostFollowing()
 
 TVSeries* UserManagementGraph::followingMostWatchedSeries(User* userPtr)
 {
-    // question 2 
-    TVSeries* vMostViewed=nullptr;
+    //Declaração de Variáveis
+    TVSeries* vMostViewed = nullptr;
+    vector<TVSeries*> AdjWatchedSer;
+    vector<int> EpsCnt, UsersCnt;
+    bool FoundUser = false;
+
+
+    //Verifica se o Nó pertence ao Grafo
+    for(size_t i = 0; i < userNodes.size(); i++)
+    {
+        if(userNodes[i] == userPtr)
+        {
+            FoundUser = true;
+            break;
+        }
+    }
+
+    if(!FoundUser)
+    {
+        return nullptr;
+    }
+
+
+    //Cria um vetor com todas as séries vistas pelos users adjacentes
+    for(auto UserPos = network[userNodePosition(userPtr)].begin(); UserPos != network[userNodePosition(userPtr)].end(); UserPos++)
+    {
+        for(auto SerPos = (*UserPos)->getWatchedSeries().begin(); SerPos != (*UserPos)->getWatchedSeries().end(); SerPos++)
+        {
+            if(find(AdjWatchedSer.begin(), AdjWatchedSer.end(), *SerPos) == AdjWatchedSer.end())
+            {
+                AdjWatchedSer.push_back(*SerPos);
+                EpsCnt.push_back(0);
+                UsersCnt.push_back(0);
+            }
+        }
+    }
+
+
+    //Calcula o número de episódios vistos e o número de utilizadores que viram cada série
+    for(size_t AdjSerPos = 0; AdjSerPos < AdjWatchedSer.size(); AdjSerPos++)
+    {
+        for(auto UserPos = network[userNodePosition(userPtr)].begin(); UserPos != network[userNodePosition(userPtr)].end(); UserPos++)
+        {
+            auto it = find((*UserPos)->getWatchedSeries().begin(), (*UserPos)->getWatchedSeries().end(), AdjWatchedSer[AdjSerPos]);
+
+            if(it != (*UserPos)->getWatchedSeries().end())
+            {
+                size_t i = distance((*UserPos)->getWatchedSeries().begin(), it);
+                EpsCnt[AdjSerPos] += (*UserPos)->getEpisodesWatched()[i];
+                UsersCnt[AdjSerPos]++;
+            }
+        }
+    }
+
+
+    //Seleciona a série mais assistida de acordo com os critérios especificados
+    int EpsRec = 0;
+    int UserRec = 0;
+
+    for(size_t i = 0; i < AdjWatchedSer.size(); i++)
+    {
+        if(EpsCnt[i] > EpsRec || (EpsCnt[i] == EpsRec && UsersCnt[i] > UserRec) || (EpsCnt[i] == EpsRec && UsersCnt[i] == UserRec && AdjWatchedSer[i]->getTitle() < vMostViewed->getTitle()))
+        {
+            EpsRec = EpsCnt[i];
+            UserRec = UsersCnt[i];
+            vMostViewed = AdjWatchedSer[i];
+        }
+    }
+
     return vMostViewed;
+
+    //answer here
+    //Because there is no other option :)
 }
 
 
