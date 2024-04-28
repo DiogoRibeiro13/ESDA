@@ -1296,8 +1296,102 @@ TVSeries* UserManagementGraph::followingMostWatchedSeries(User* userPtr)
 
 int UserManagementGraph::shortestPaths(User* userSrc, User* userDst)
 {
-    // question 3     
-    return -1;
+    //Declaração de Variáveis e Listas
+    int Distance = 0;
+    list<User*> AdjList;
+    bool FoundUserSrc = false;
+    bool FoundUserDst = false;
+
+    //Verifica se o User de Partida e Destino são nullptr
+    if(userSrc == nullptr || userDst == nullptr)
+    {
+        return -1;
+    }
+
+
+    //Verifica se os Nós pertencem ao Grafo
+    for(size_t i = 0; i < userNodes.size(); i++)
+    {
+        if(userNodes[i] == userSrc)
+        {
+            FoundUserSrc = true;
+        }
+
+        if(userNodes[i] == userDst)
+        {
+            FoundUserDst = true;
+        }
+    }
+
+    if(FoundUserSrc == false || FoundUserDst == false)
+    {
+        return -1;
+    }
+
+
+    //Inicializa o atributo length dos nós
+    for(auto NodePos = userNodes.begin(); NodePos != userNodes.end(); NodePos++)
+    {
+        if(NodePos == userSrc)
+        {
+            NodePos->setLength(0);
+        }
+        
+        else
+        {
+            NodePos->setLength(1000);
+        }
+    }
+    
+
+    //Inicialização de Vetores e Filas
+    priority_queue<User*, vector<User*>, CompareP> UsersQueue;
+    
+    UsersQueue.push(userSrc);
+    
+
+    //Ciclo "while" que precorre a fila "UsersQueue"
+    while(!UsersQueue.empty())
+    {
+        //Move o User atual para "Aux" e remove-o de UsersQueue
+        User* Aux = UsersQueue.top();
+        UsersQueue.pop();
+
+        //Verifica se o User atual é o o nosso userDst
+        //Se for, podemos dar break porque já chegamos ao nosso destino
+        if(Aux == userDst)
+        {
+            break;
+        }
+
+        //Cria uma lista com todos os Users adjacentes ao User Atual 
+        for(auto UserPos = network[userNodePosition(Aux)].begin(); UserPos != network[userNodePosition(Aux)].end(); UserPos++)
+        {
+            AdjList.push_back(UserPos);
+        }
+        
+        //Adiciona os Users Adjacentes a "UsersQueue" para repetir o processo até que seja encontrado "userDst"
+        for(auto AdjUserPos = AdjList.begin(); AdjUserPos != AdjList.end(); AdjUserPos++)
+        {
+            Distance = Aux->getLength() + 1;
+            
+            if(Distance < AdjUserPos->getLength())
+            {
+                AdjUserPos->setLength(Distance);
+                UsersQueue.push(AdjUserPos);
+            }
+        }
+    }
+    
+
+    //Caso não exista um caminho entre os dois nós
+    if(userDst->getLength() == 1000)
+    {
+        return -2;
+    }
+
+
+    return userDst->getLength();
 
     //answer here
     //Because there is no other option :)
