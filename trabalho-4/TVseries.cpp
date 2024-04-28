@@ -1304,8 +1304,6 @@ TVSeries* UserManagementGraph::followingMostWatchedSeries(User* userPtr)
 int UserManagementGraph::shortestPaths(User* userSrc, User* userDst)
 {
     //Declaração de Variáveis e Listas
-    int Distance = 0;
-    list<User*> AdjList;
     bool FoundUserSrc = false;
     bool FoundUserDst = false;
     int Max = 10000;
@@ -1352,13 +1350,14 @@ int UserManagementGraph::shortestPaths(User* userSrc, User* userDst)
     }
     
 
-    //Inicialização de uma fila de prioridade "UsersPQueue"
-    //Esta fila armazena User* num Vetor e calcula a sua prioridade através da estrutura "CompareP"
+    //Inicialização de uma min-heap priority queue "UsersPQueue"
+    //Esta queue armazena User* num Vetor e determina a sua prioridade através da estrutura "CompareP"
     priority_queue<User*, vector<User*>, CompareP> UsersPQueue;
     
-    //Adiciona userSrc a 
     UsersPQueue.push(userSrc);
-    
+
+    list<User*> AdjList;
+    int Distance = 0;
 
     //Ciclo "while" que precorre a fila "UsersPQueue"
     while(!UsersPQueue.empty())
