@@ -1483,9 +1483,163 @@ int HashTable::insertCountryStats(CountryStats &countryS)
 
 int HashTable::importFromVector(UserManagement &userManager)      
 {
-    // question 5    
-    return -1;
+    vector<vector<TVSeries*>> SeriesVec;
+
+    SeriesVec.resize(tableSize);
+
+    for(auto UserPos = userManager.getVectorUsers().begin(); UserPos != userManager.getVectorUsers().end(); UserPos++)
+    {
+
+        if(*UserPos == nullptr)
+        {
+            return -1;
+        }
+
+        int i = searchCountryStats(UserPos->getCountry());
+        vector<int> SerPerGen(N_GENRES, 0);
+
+        if(i == -1)
+        {
+            for(size_t i = 0; i < UserPos->getWatchedSeries().size(); i++)
+            {
+                for(int j = 0; j < N_GENRES; j++)
+                {
+                    if(UserPos->getWatchedSeries()[i]->getGenre() == vGenres[j])
+                    {
+                        SerPerGen[j]++;
+                    }
+                }
+            }
+
+            CountryStats *NewCountryStats = new CountryStats(UserPos->getCountry(), 1, UserPos->getWatchedSeries().size(), UserPos->getWatchedSeries().size(), SerPerGen);
+            
+            i = insertCountryStats(*NewCountryStats);
+
+            for(size_t i = 0; i < UserPos->getWatchedSeries().size(); i++)
+            {
+                SeriesVec[i].push_back(UserPos->getWatchedSeries()[i]);
+            }
+        }
+
+        else
+        {
+            table[i]->nUsers++;
+            
+            for(size_t i = 0; i < UserPos->getWatchedSeries().size(); i++)
+            {
+                if(find(SeriesVec[i].begin(), SeriesVec[i].end(), UserPos->getWatchedSeries()[i]) == SeriesVec[i].end())
+                {
+                    SeriesVec[i].push_back(UserPos->getWatchedSeries()[i]);
+                }
+            }
+
+            table[i]->nTVSeries = SeriesVec[i].size();
+
+            float aux = (table[i]->averageTVseries) * (table[i]->nUsers - 1);
+
+            aux = aux + UserPos->getWatchedSeries().size();
+
+            aux = aux / (float)table[i]->nUsers;
+
+            table[i]->averageTVseries = aux;
+
+            for(size_t i = 0; i < SeriesVec[i].size(); i++)
+            {
+                for(size_t j = 0; j < N_GENRES; j++)
+                {
+                    if(SeriesVec[i][i]->getGenre() == vGenres[j])
+                    {
+                        SerPerGen[j]++;
+                    }
+                }
+            }
+
+            table[i]->nGenre = SerPerGen;
+        }
+    }
+
+    return 0;
 
     //answer here
     //Because there is no other option :)
 }
+
+
+
+    //TEST CODE THAT COMPILES BUT DOESN'T WORK//
+
+    vector<vector<TVSeries*>> SeriesVec;
+
+    SeriesVec.resize(tableSize);
+
+    for(auto UserPos = userManager.getVectorUsers().begin(); UserPos != userManager.getVectorUsers().end(); UserPos++)
+    {
+        if(*UserPos == nullptr)
+        { 
+            return -1;
+        }
+
+        int i = searchCountryStats((*UserPos)->getCountry()); 
+
+        vector<int> SerPerGen(N_GENRES, 0);
+
+        if (i == -1)
+        {
+            for(size_t i = 0; i < (*UserPos)->getWatchedSeries().size(); i++)
+            {
+                for(int j = 0; j < N_GENRES; j++) {
+                    if((*UserPos)->getWatchedSeries()[i]->getGenre() == vGenres[j])
+                    {
+                        SerPerGen[j]++;
+                    }
+                }
+            }
+
+            CountryStats *NewCountryStats = new CountryStats((*UserPos)->getCountry(), 1, (*UserPos)->getWatchedSeries().size(), (*UserPos)->getWatchedSeries().size(), SerPerGen);
+            i = insertCountryStats(*NewCountryStats);
+
+            for(size_t i = 0; i < (*UserPos)->getWatchedSeries().size(); i++)
+            {
+                SeriesVec[i].push_back((*UserPos)->getWatchedSeries()[i]);
+            }
+
+        } 
+        
+        else
+        {
+            table[i]->nUsers++;
+
+            for(size_t i = 0; i < (*UserPos)->getWatchedSeries().size(); i++)
+            {
+                if(find(SeriesVec[i].begin(), SeriesVec[i].end(), (*UserPos)->getWatchedSeries()[i]) == SeriesVec[i].end())
+                {
+                    SeriesVec[i].push_back((*UserPos)->getWatchedSeries()[i]);
+                }
+            }
+
+            table[i]->nTVSeries = SeriesVec[i].size();
+
+            float aux = (table[i]->averageTVseries) * (table[i]->nUsers - 1);
+
+            aux = aux + (*UserPos)->getWatchedSeries().size();
+
+            aux = aux / (float)table[i]->nUsers;
+
+            table[i]->averageTVseries = aux;
+
+            for(size_t i = 0; i < SeriesVec[i].size(); i++)
+            {
+                for(size_t j = 0; j < N_GENRES; j++)
+                {
+                    if(SeriesVec[i][i]->getGenre() == vGenres[j])
+                    { 
+                        SerPerGen[j]++;
+                    }
+                }
+            }
+            
+            table[i]->nGenre = SerPerGen;
+        }
+    }
+
+    return 0; 
