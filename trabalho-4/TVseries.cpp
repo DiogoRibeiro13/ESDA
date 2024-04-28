@@ -1156,7 +1156,7 @@ struct CompareP {
 
 
 
-
+//1
 
 vector<User*> UserManagementGraph::mostFollowing()
 {
@@ -1186,7 +1186,7 @@ vector<User*> UserManagementGraph::mostFollowing()
             Record = NumFollow;
         }
         
-        
+
         else if(NumFollow == Record)
         {
             ReturnVec.push_back(*UserPos);
@@ -1206,7 +1206,7 @@ vector<User*> UserManagementGraph::mostFollowing()
 
 
 
-
+//2
 
 TVSeries* UserManagementGraph::followingMostWatchedSeries(User* userPtr)
 {
@@ -1292,12 +1292,15 @@ TVSeries* UserManagementGraph::followingMostWatchedSeries(User* userPtr)
 
 
 
-
+//3
 
 int UserManagementGraph::shortestPaths(User* userSrc, User* userDst)
 {
     // question 3     
     return -1;
+
+    //answer here
+    //Because there is no other option :)
 }
 
 
@@ -1307,12 +1310,15 @@ int UserManagementGraph::shortestPaths(User* userSrc, User* userDst)
 
 
 
-
+//4
 
 int HashTable::insertCountryStats(CountryStats &countryS)
 {       
     // question 4    
     return -1;
+
+    //answer here
+    //Because there is no other option :)
 }
 
 
@@ -1322,10 +1328,13 @@ int HashTable::insertCountryStats(CountryStats &countryS)
 
 
 
-
+//5
 
 int HashTable::importFromVector(UserManagement &userManager)      
 {
     // question 5    
     return -1;
+
+    //answer here
+    //Because there is no other option :)
 }
