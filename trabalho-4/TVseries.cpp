@@ -1210,11 +1210,18 @@ vector<User*> UserManagementGraph::mostFollowing()
 
 TVSeries* UserManagementGraph::followingMostWatchedSeries(User* userPtr)
 {
-    //Declaração de Variáveis
+    //Declaração de Variáveis e Vetores
     TVSeries* vMostViewed = nullptr;
     vector<TVSeries*> AdjWatchedSer;
     vector<int> EpsCnt, UsersCnt;
     bool FoundUser = false;
+
+
+    //Verifica se userPtr é nullptr
+    if(userPtr == nullptr)
+    {
+        return NULL;
+    }
 
 
     //Verifica se o Nó pertence ao Grafo
@@ -1229,7 +1236,7 @@ TVSeries* UserManagementGraph::followingMostWatchedSeries(User* userPtr)
 
     if(!FoundUser)
     {
-        return nullptr;
+        return NULL;
     }
 
 
@@ -1301,6 +1308,7 @@ int UserManagementGraph::shortestPaths(User* userSrc, User* userDst)
     list<User*> AdjList;
     bool FoundUserSrc = false;
     bool FoundUserDst = false;
+    int Max = 10000;
 
     //Verifica se o User de Partida e Destino são nullptr
     if(userSrc == nullptr || userDst == nullptr)
@@ -1332,60 +1340,61 @@ int UserManagementGraph::shortestPaths(User* userSrc, User* userDst)
     //Inicializa o atributo length dos nós
     for(auto NodePos = userNodes.begin(); NodePos != userNodes.end(); NodePos++)
     {
-        if(NodePos == userSrc)
+        if(*NodePos == userSrc)
         {
-            NodePos->setLength(0);
-        }
+            (*NodePos)->setLength(0);
+        } 
         
         else
         {
-            NodePos->setLength(1000);
+            (*NodePos)->setLength(Max);
         }
     }
     
 
-    //Inicialização de Vetores e Filas
-    priority_queue<User*, vector<User*>, CompareP> UsersQueue;
+    //Inicialização de uma fila de prioridade "UsersPQueue"
+    //Esta fila armazena User* num Vetor e calcula a sua prioridade através da estrutura "CompareP"
+    priority_queue<User*, vector<User*>, CompareP> UsersPQueue;
     
-    UsersQueue.push(userSrc);
+    //Adiciona userSrc a 
+    UsersPQueue.push(userSrc);
     
 
-    //Ciclo "while" que precorre a fila "UsersQueue"
-    while(!UsersQueue.empty())
+    //Ciclo "while" que precorre a fila "UsersPQueue"
+    while(!UsersPQueue.empty())
     {
-        //Move o User atual para "Aux" e remove-o de UsersQueue
-        User* Aux = UsersQueue.top();
-        UsersQueue.pop();
+        // Move o User atual para "Aux" e remove-o de UsersPQueue
+        User* Aux = UsersPQueue.top();
+        UsersPQueue.pop();
 
-        //Verifica se o User atual é o o nosso userDst
-        //Se for, podemos dar break porque já chegamos ao nosso destino
+        // Verifica se o User atual é o o nosso userDst
         if(Aux == userDst)
         {
             break;
         }
 
-        //Cria uma lista com todos os Users adjacentes ao User Atual 
+        // Cria uma lista com todos os Users adjacentes ao User Atual 
         for(auto UserPos = network[userNodePosition(Aux)].begin(); UserPos != network[userNodePosition(Aux)].end(); UserPos++)
         {
-            AdjList.push_back(UserPos);
+            AdjList.push_back(*UserPos);
         }
-        
-        //Adiciona os Users Adjacentes a "UsersQueue" para repetir o processo até que seja encontrado "userDst"
+
+        // Adiciona os Users Adjacentes a "UsersPQueue" 
         for(auto AdjUserPos = AdjList.begin(); AdjUserPos != AdjList.end(); AdjUserPos++)
         {
             Distance = Aux->getLength() + 1;
-            
-            if(Distance < AdjUserPos->getLength())
+
+            if(Distance < (*AdjUserPos)->getLength())
             {
-                AdjUserPos->setLength(Distance);
-                UsersQueue.push(AdjUserPos);
+                (*AdjUserPos)->setLength(Distance);
+                UsersPQueue.push(*AdjUserPos);
             }
         }
     }
     
 
     //Caso não exista um caminho entre os dois nós
-    if(userDst->getLength() == 1000)
+    if(userDst->getLength() == Max)
     {
         return -2;
     }
