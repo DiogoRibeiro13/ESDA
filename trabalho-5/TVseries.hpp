@@ -60,14 +60,20 @@ public:
 class TVSeriesAPP {
 private:
 
-    
+    unordered_map<string, TitleBasics> TitleBasicsMap;
+    unordered_map<string, TitleEpisode> TitleEpisodesMap;
+    unordered_map<string, TitlePrincipals> TitlePrincipalsMap;
+
 public:
 
 
     /* --- Constructor --- */
     TVSeriesAPP();
-  
+
     ~TVSeriesAPP();
+    
+
+
     /** @brief add TtitleBasic to TVSeriesAPP */
     void addTitleBasics(const TitleBasics& title);
 
@@ -77,6 +83,8 @@ public:
     /** @brief add TitlePrincipals to TVSeriesAPP */
     void addTitlePrincipal(const TitlePrincipals& principal);
     
+
+
     //PERGUNTA 1
     vector<string> getUniquePrincipals(const string& seriesTconst ) const;
 
@@ -94,19 +102,8 @@ public:
 
     //PERGUNTA 6
     string getPrincipalFromCharacter(const string& character) const;
-    
-
-
-    
 };
 
 
 
 #endif // TVSERIES_HPP
-
-
-
-
-
-
-
