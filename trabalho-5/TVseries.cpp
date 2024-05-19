@@ -4,19 +4,20 @@
 #include <functional>
 #include <stack>
 
+
 TVSeriesAPP::TVSeriesAPP()
 {
-    auto TitleBasicsMap = unordered_map<string, TitleBasics>();
-    auto TitleEpisodesMap = unordered_map<string, TitleEpisode>();
-    auto TitlePrincipalsMap = unordered_map<string, TitlePrincipals>();
+    SeriesMap = unordered_map<string, TitleBasics>();
+    EpisodesMap = unordered_map<string, vector<TitleEpisode>>();
+    PeopleMap = unordered_map<string, vector<TitlePrincipals>>();
 }
 
 
 TVSeriesAPP::~TVSeriesAPP()
 {
-    TitleBasicsMap.clear();
-    TitleEpisodesMap.clear();
-    TitlePrincipalsMap.clear();
+    SeriesMap.clear();
+    EpisodesMap.clear();
+    PeopleMap.clear();  
 }
 
 
@@ -25,19 +26,19 @@ TVSeriesAPP::~TVSeriesAPP()
 
 void TVSeriesAPP::addTitleBasics(const TitleBasics& title)
 {
-    
+    SeriesMap[title.tconst] = title;  
 }
 
 
 void TVSeriesAPP::addTitleEpisodes(const TitleEpisode& episode)
 {
-  
+    EpisodesMap[episode.parentTconst].push_back(episode);
 }
 
 
 void TVSeriesAPP::addTitlePrincipal(const TitlePrincipals& principal)
 {
-
+    PeopleMap[principal.tconst].push_back(principal);
 }
 
 
@@ -78,9 +79,9 @@ string TVSeriesAPP::getMostSeriesGenre() const
 
 //PERGUNTA 3: 
 
-string TVSeriesAPP::getPrincipalFromCharacter(const string& character) const
+vector<string> TVSeriesAPP::principalsWithMultipleCategories(const string& seriesTconst ) const
 {
-    return "";
+    return {};
 }
 
 
@@ -94,7 +95,7 @@ string TVSeriesAPP::getPrincipalFromCharacter(const string& character) const
 
 //PERGUNTA 4
 
-vector<string> TVSeriesAPP::principalsWithMultipleCategories(const string& seriesTconst ) const
+vector<string> TVSeriesAPP::principalsInAllEpisodes(const string& seriesTconst) const
 {
     return {};
 }
@@ -125,7 +126,7 @@ int TVSeriesAPP::principalInMultipleGenres(vector<string> vGenres)
 
 
 //PERGUNTA 6: 
-vector<string> TVSeriesAPP::principalsInAllEpisodes(const string& seriesTconst) const
+string TVSeriesAPP::getPrincipalFromCharacter(const string& character) const
 {
-    return {};
+    return "";
 }
