@@ -7,6 +7,8 @@
 
 using namespace std; 
 
+
+
 /** @brief Class to represent a TVSerie. */
 class TitleBasics {
 public:
@@ -23,6 +25,10 @@ public:
 
 };
 
+
+
+
+
 /** @brief Class to represent the a Crew or aCast associated to a episode */
 class TitlePrincipals {
 public:
@@ -38,6 +44,10 @@ public:
     
 
 };
+
+
+
+
 
 /** @brief Class to represent each episode  */
 class TitleEpisode {
@@ -56,54 +66,67 @@ public:
 
 
 
+
 /** @brief Class to represent a APP TVSeries Management */
 class TVSeriesAPP {
+
 private:
 
-    unordered_map<string, TitleBasics> TitleBasicsMap;
-    unordered_map<string, TitleEpisode> TitleEpisodesMap;
-    unordered_map<string, TitlePrincipals> TitlePrincipalsMap;
-
+    unordered_map<string, TitleBasics> SeriesMap;
+    unordered_map<string, vector<TitleEpisode>> EpisodesMap;
+    unordered_map<string, vector<TitlePrincipals>> PeopleMap;
+    
 public:
 
-
-    /* --- Constructor --- */
+    /* --- Construtor --- */
     TVSeriesAPP();
-
+  
+    /* --- Destrutor --- */
+  
     ~TVSeriesAPP();
+    
     
 
 
+    
     /** @brief add TtitleBasic to TVSeriesAPP */
     void addTitleBasics(const TitleBasics& title);
 
+
     /** @brief add TitleEpisode to TVSeriesAPP  */
     void addTitleEpisodes(const TitleEpisode& episode);
+
 
     /** @brief add TitlePrincipals to TVSeriesAPP */
     void addTitlePrincipal(const TitlePrincipals& principal);
     
 
 
+
+
     //PERGUNTA 1
     vector<string> getUniquePrincipals(const string& seriesTconst ) const;
+
 
     //PERGUNTA 2
     string getMostSeriesGenre() const;
 
+
     //PERGUNTA 3
     vector<string> principalsWithMultipleCategories(const string& seriesTconst) const;
+
 
     //PERGUNTA 4
     vector<string> principalsInAllEpisodes(const string& seriesTconst) const;
 
+
     //PERGUNTA 5
     int principalInMultipleGenres(vector<string> vGenres);
+
 
     //PERGUNTA 6
     string getPrincipalFromCharacter(const string& character) const;
 };
-
 
 
 #endif // TVSERIES_HPP
