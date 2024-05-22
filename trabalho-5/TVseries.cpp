@@ -149,7 +149,6 @@ string TVSeriesAPP::getMostSeriesGenre() const
         }
     }
 
-
     return GeneroMaisFreq;
 }
 
@@ -166,59 +165,69 @@ string TVSeriesAPP::getMostSeriesGenre() const
 
 vector<string> TVSeriesAPP::principalsWithMultipleCategories(const string& seriesTconst ) const
 {
-    unordered_map<string, unordered_set<string>> principalCategories;
-    unordered_map<string, string> nconstToName;
-    vector<string> principals;
+    //Inicializa o mapa que guarda as categorias de trabalho que cada pessoa desempenhou
+    unordered_map<string, unordered_set<string>> CategoriasPessoas;
+
+    //Inicializa o mapa que nos permite acessar o "primaryName" de cada pessoa através da váriavel "nconst"
+    unordered_map<string, string> NconstParaNome;
+    
+    //Inicializa o vetor com o conjunto de pessoas que desempanharam múltiplas categorias de trabalho
+    vector<string> Pessoas;
 
 
-    // Verificar se a série existe
+    //Verifica se "seriesTconst" é encontrado em "SeriesMap"
     if(SeriesMap.find(seriesTconst) == SeriesMap.end())
     {
-        return principals; // Retorna vetor vazio
+        //Caso não seja, significa que não existem episódios ou pessoas, logo retorna um vetor vazio
+        return Pessoas;
     }
 
 
-    // Iterar sobre todos os episódios da série
+    //Verifica se existem episódios da série no mapa de episódios, "EpisodesMap"
     if(EpisodesMap.find(seriesTconst) != EpisodesMap.end())
     {
-        const auto& episodes = EpisodesMap.at(seriesTconst);
+        //Guarda os episódios da série em "EpisodiosSerie"
+        auto& EpisodiosSerie = EpisodesMap.at(seriesTconst);
 
-        for(const auto& episode : episodes)
+        //Ciclo "for" que precorre os episódios da série
+        for(auto& Episodio : EpisodiosSerie)
         {
-            // Verificar se existem principais para este episódio
-            if(PeopleMap.find(episode.tconst) != PeopleMap.end())
+            //Verifica que pessoas participaram neste episódio
+            if(PeopleMap.find(Episodio.tconst) != PeopleMap.end())
             {
-                const auto& principalsForEpisode = PeopleMap.at(episode.tconst);
+                //Guarda os pessoas que participaram no episódio em "PessoasEpisodio"
+                auto& PessoasEpisodio = PeopleMap.at(Episodio.tconst);
 
-                for(const auto& principal : principalsForEpisode)
+                //Ciclo "for" que precorre as pessoas do episódio
+                for(auto& Pessoa : PessoasEpisodio)
                 {
-                    // Adicionar a categoria do principal ao conjunto de categorias
-                    principalCategories[principal.nconst].insert(principal.category);
+                    //Adiciona a categoria da pessoa ao seu conjunto de categorias
+                    CategoriasPessoas[Pessoa.nconst].insert(Pessoa.category);
 
-                    // Mapear nconst para primaryName
-                    nconstToName[principal.nconst] = principal.primaryName;
+                    //Adiciona ao mapa "NconstParaNome" o "primaryName" da pessoa que corresponde a nconst
+                    NconstParaNome[Pessoa.nconst] = Pessoa.primaryName;
                 }
             }
         }
     }
 
 
-    // Iterar sobre todos os principais e suas categorias
-    for(const auto& entry : principalCategories) 
+    //Ciclo "for" que precorre "CategoriasPessoas"
+    for(auto& i : CategoriasPessoas) 
     {
-        // Se o principal tem mais de uma categoria, adicione-o à lista
-        if(entry.second.size() > 1) 
+        //Verifica se a pessoa tem mais do que uma categoria associada
+        if(i.second.size() > 1) 
         {
-            principals.push_back(nconstToName[entry.first]);
+            //Caso tenha, adiciona o nome da pessoa ao vetor "Pessoas" para ser retornado
+            Pessoas.push_back(NconstParaNome[i.first]);
         }
     }
 
 
-    // Ordenar a lista de principais alfabeticamente
-    sort(principals.begin(), principals.end());
+    //Ordena alfabeticamente o vetor "Pessoas" antes de ser retornado
+    sort(Pessoas.begin(), Pessoas.end());
 
-
-    return principals;
+    return Pessoas;
 }
 
 
@@ -234,50 +243,71 @@ vector<string> TVSeriesAPP::principalsWithMultipleCategories(const string& serie
 
 vector<string> TVSeriesAPP::principalsInAllEpisodes(const string& seriesTconst) const
 {
-    unordered_map<string, int> principalEpisodeCount;
-    unordered_map<string, string> nconstToName;
-    vector<string> principals;
+    //Inicializa um mapa para guardar o número de episódios em que cada pessoa aparece
+    unordered_map<string, int> ContagemParticipaçoes;
 
-    // Verificar se a série existe
-    if (SeriesMap.find(seriesTconst) == SeriesMap.end()) {
-        return principals; // Retorna vetor vazio
+    //Inicializa o mapa que nos permite acessar o "primaryName" de cada pessoa através da váriavel "nconst"
+    unordered_map<string, string> NconstParaNome;
+
+    //Inicializa o vetor com o conjunto de pessoas que participaram em todos os episódios
+    vector<string> Pessoas;
+
+
+    //Verifica se se a série existe no mapa "SeriesMap"
+    if(SeriesMap.find(seriesTconst) == SeriesMap.end()) 
+    {
+        //Caso não exista, retorna o vetor "Pessoas" ainda vazio
+        return Pessoas;
     }
 
-    // Contar o número total de episódios da série
+
+    //Inicializa a variável "totalEpisodes" com o número total de episódios da série
     int totalEpisodes = EpisodesMap.at(seriesTconst).size();
 
-    // Iterar sobre todos os episódios da série
-    for (const auto& episode : EpisodesMap.at(seriesTconst)) {
-        // Verificar se existem principais para este episódio
-        if (PeopleMap.find(episode.tconst) != PeopleMap.end()) {
-            const auto& principalsForEpisode = PeopleMap.at(episode.tconst);
-            unordered_set<string> countedPrincipals;
-            for (const auto& principal : principalsForEpisode) {
-                // Se o principal ainda não foi contado para este episódio, incrementar a contagem
-                if (countedPrincipals.find(principal.nconst) == countedPrincipals.end()) {
-                    principalEpisodeCount[principal.nconst]++;
-                    countedPrincipals.insert(principal.nconst);
-                    // Mapear nconst para primaryName
-                    nconstToName[principal.nconst] = principal.primaryName;
+
+    //Ciclo "for" que precorre "CategoriasPessoas"
+    for(const auto& Episodio : EpisodesMap.at(seriesTconst))
+    {
+        //Verifica quais foram as pessoas que participaram no episódio
+        if (PeopleMap.find(Episodio.tconst) != PeopleMap.end())
+        {
+            //Guarda os pessoas que participaram no episódio em "PessoasEpisodio"
+            const auto& PessoasEpisodio = PeopleMap.at(Episodio.tconst);
+
+            //Conjunto de pessoas que já foram contadas, usado para evitar repetições na contagem
+            unordered_set<string> PessoasContadas;
+
+            //Ciclo "for" que precorre as pessoas que participaram no episódio
+            for(const auto& principal : PessoasEpisodio)
+            {
+                //Verifica se a pessoa já foi contada
+                if(PessoasContadas.find(principal.nconst) == PessoasContadas.end())
+                {
+                    ContagemParticipaçoes[principal.nconst]++; //Incrementa em 1 a partipação da pessoa
+                    PessoasContadas.insert(principal.nconst); //Adiciona a pessoa ao conjunto de contados com nconst
+                    NconstParaNome[principal.nconst] = principal.primaryName; //Adiciona ao mapa "NconstParaNome" o "primaryName" da pessoa que corresponde a nconst
                 }
             }
         }
     }
 
-    // Iterar sobre todos os principais e suas contagens de episódios
-    for (const auto& entry : principalEpisodeCount) 
+
+    //Ciclo "for" que precorre "ContagemParticipaçoes"
+    for(const auto& entry : ContagemParticipaçoes) 
     {
-        // Se o principal aparece em todos os episódios, adicione-o à lista
-        if (entry.second == totalEpisodes) 
+        //Verifica se a pessoa aprece em todos os episódios
+        if(entry.second == totalEpisodes)
         {
-            principals.push_back(nconstToName[entry.first]);
+            //Caso tenha participado, adiciona a pessoa ao vetor "Pessoas"
+            Pessoas.push_back(NconstParaNome[entry.first]);
         }
     }
+    
 
-    // Ordenar a lista de principais alfabeticamente
-    sort(principals.begin(), principals.end());
+    //Ordena alfabeticamente o vetor "Pessoas" antes de ser retornado
+    sort(Pessoas.begin(), Pessoas.end());
 
-    return principals;
+    return Pessoas;
 }
 
 
@@ -293,7 +323,47 @@ vector<string> TVSeriesAPP::principalsInAllEpisodes(const string& seriesTconst) 
 
 int TVSeriesAPP::principalInMultipleGenres(vector<string> vGenres)
 {
-    return -1;
+    unordered_map<string, unordered_set<string>> GenerosPessoas; //mapa para guardar, para cada pessoa, um conjunto dos gêneros das séries em que participou
+
+    // para cada série no mapa de titulos verifica-se se a série tem os gêneros pedidos e se tem episódios 
+    for(auto& i : SeriesMap) 
+    {
+        TitleBasics& Titulo = i.second; // título atual
+
+        // para cada gênero da série atual se o genero estiver no vetor de gêneros pedidos e se a série tem episódios
+        for(string& Genero : Titulo.genres) 
+        {
+            if(find(vGenres.begin(), vGenres.end(), Genero) != vGenres.end() && EpisodesMap.find(Titulo.tconst) != EpisodesMap.end())
+            {
+                auto& episodes = EpisodesMap.at(Titulo.tconst);
+                for(auto& episode : episodes) //para cada episódio da série atual
+                {
+                    if(PeopleMap.find(episode.tconst) != PeopleMap.end()) //se houver principais para o episódio atual
+                    {
+                        auto& PessoasEpisodio = PeopleMap.at(episode.tconst);
+
+                        for(auto& Pessoa : PessoasEpisodio) // para cada principal no episódio atual
+                        {
+                            GenerosPessoas[Pessoa.nconst].insert(Genero); // adiciona o gênero ao conjunto de gêneros da pessoa atual
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    
+    unordered_set<string> principalsInGenres; //guarda as pessoas que participaram em todas as séries dos gêneros pedidos
+
+    for (auto& i : GenerosPessoas) //PAra cada pessoa no mapa
+    {
+        if (i.second.size() == vGenres.size()) //se a pessoa participou em todas as séries dos gêneros pedidos
+        {
+            principalsInGenres.insert(i.first); // adiciona a pessoa
+        }
+    }
+
+    return principalsInGenres.size(); //dá return do númeor de pessoas
 }
 
 
